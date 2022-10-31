@@ -58,7 +58,8 @@ fun PasswordCard() {
         PasswordComplexityWithChips()
         Spacer(modifier = Modifier.size(16.dp))
 
-        PasswordLength()
+//        PasswordLength()
+        PassLengthSlider()
         Spacer(modifier = Modifier.size(16.dp))
 
         PasswordParameters()
@@ -176,6 +177,30 @@ fun PasswordLength() {
             )
         }
     }
+}
+
+@Composable
+fun PassLengthSlider() {
+    var value by rememberSaveable { mutableStateOf(8f) }
+    var valueText by rememberSaveable { mutableStateOf(value.toInt()) }
+
+    Column() {
+        Row() {
+            Text(text = "Password length ")
+            Text(text = valueText.toString())
+        }
+        Slider(
+            value = value,
+            onValueChange = {
+                value = it
+                valueText = it.toInt()
+            },
+//            onValueChangeFinished = { valueText = value.toInt() },
+            valueRange = 4f .. 20f,
+            steps = 15
+        )
+    }
+
 }
 
 @Preview(showBackground = true)
