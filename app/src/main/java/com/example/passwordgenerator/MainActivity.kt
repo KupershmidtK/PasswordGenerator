@@ -95,7 +95,7 @@ fun PasswordComplexityWithChips() {
             modifier = Modifier
                 .weight(1f),
             onClick = { /* do something*/ }) {
-            Text("Custom")
+            Text("PIN")
         }
 
     }
