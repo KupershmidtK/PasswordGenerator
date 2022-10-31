@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PasswordGenerator</string>
+    <string name="pincode_text">PIN code</string>
+    <string name="easy_pass_text">Easy</string>
+    <string name="medium_pass_text">Medium</string>
+    <string name="hard_pass_text">Hard</string>
+    <string name="pass_complexity_text">Complexity</string>
+</resources>
