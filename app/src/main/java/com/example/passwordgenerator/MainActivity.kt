@@ -3,9 +3,8 @@ package com.example.passwordgenerator
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.horizontalScroll
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -15,17 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.passwordgenerator.ui.theme.PasswordGeneratorTheme
-
 
 
 class MainActivity : ComponentActivity() {
@@ -46,7 +41,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun PasswordCard() {
+fun PasswordCard(viewModel: PasswordViewModel = viewModel()) {
 
     Column (modifier = Modifier.padding(8.dp)) {
 //        Divider()
@@ -55,46 +50,60 @@ fun PasswordCard() {
         Spacer(modifier = Modifier.size(16.dp))
 
 //        PasswordComplexity()
-        PasswordComplexityWithChips()
+        PasswordComplexityWithChips(action = { viewModel.setComplexity(it) })
         Spacer(modifier = Modifier.size(16.dp))
 
 //        PasswordLength()
-        PassLengthSlider()
+        PassLengthSlider(viewModel.uiState.passLength.value, { viewModel.uiState.passLength.value = it })
         Spacer(modifier = Modifier.size(16.dp))
 
-        PasswordParameters()
+        //PasswordParameters()
+        CheckBoxAndText(text = "a - z", handler = { viewModel.uiState.useLowerLetters.value = it }, viewModel.uiState.useLowerLetters.value )
+        CheckBoxAndText(text = "A - Z", handler = { viewModel.uiState.useUpperLetters.value = it }, viewModel.uiState.useUpperLetters.value )
+        CheckBoxAndText(text = "0 - 9", handler = { viewModel.uiState.useNumbers.value = it }, viewModel.uiState.useNumbers.value )
+        CheckBoxAndText(text = "!, @, #, ...", { viewModel.uiState.useSymbols.value = it }, viewModel.uiState.useSymbols.value )
+
+        Spacer(modifier = Modifier.size(16.dp))
+        
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Generate")
+        }
+        
     }
 
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PasswordComplexityWithChips() {
+fun PasswordComplexityWithChips(action: (PassComplexityEnum) -> Unit) {
     Row {
         Chip(
             modifier = Modifier
                 .weight(1f, true),
-            onClick = { /* do something*/ }) {
+            onClick = { action(PassComplexityEnum.HARD) }) {
             Text("Hard")
         }
         Chip(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
-            onClick = { /* do something*/ }) {
+            onClick = { action(PassComplexityEnum.MEDIUM) }) {
             Text("Medium")
         }
         Chip(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
-            onClick = { /* do something*/ }) {
+            onClick = { action(PassComplexityEnum.EASY) }) {
             Text("Easy")
         }
         Chip(
             modifier = Modifier
                 .weight(1f),
-            onClick = { /* do something*/ }) {
+            onClick = { action(PassComplexityEnum.PIN) }) {
             Text("PIN")
         }
 
@@ -180,24 +189,27 @@ fun PasswordLength() {
 }
 
 @Composable
-fun PassLengthSlider() {
-    var value by rememberSaveable { mutableStateOf(8f) }
-    var valueText by rememberSaveable { mutableStateOf(value.toInt()) }
+fun PassLengthSlider(passLength: Int, setLength: (Int) -> Unit) {
+    //var value by rememberSaveable { mutableStateOf(passLength.toFloat()) }
+    var value = passLength.toFloat()
+    var valueText by rememberSaveable { mutableStateOf(passLength) }
 
     Column() {
         Row() {
             Text(text = "Password length ")
-            Text(text = valueText.toString())
+            Text(text = passLength.toString())
         }
         Slider(
-            value = value,
+            value = passLength.toFloat(),
             onValueChange = {
-                value = it
-                valueText = it.toInt()
+                //value = it
+                //valueText = it.toInt()
+                setLength( it.toInt() )
+
             },
-//            onValueChangeFinished = { valueText = value.toInt() },
-            valueRange = 4f .. 20f,
-            steps = 15
+            //onValueChangeFinished = { setLength (valueText) },
+            valueRange = 4f .. 15f,
+            steps = 10
         )
     }
 
