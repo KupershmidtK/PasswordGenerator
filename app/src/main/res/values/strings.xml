@@ -1,8 +1,14 @@
 <resources>
     <string name="app_name">PasswordGenerator</string>
-    <string name="pincode_text">PIN code</string>
+    <string name="pincode_text" translatable="false">PIN</string>
     <string name="easy_pass_text">Easy</string>
     <string name="medium_pass_text">Medium</string>
     <string name="hard_pass_text">Hard</string>
     <string name="pass_complexity_text">Complexity</string>
+    <string name="btn_generate_txt">Generate</string>
+    <string name="lower_case_txt">Symbols [a - z]</string>
+    <string name="upper_case_txt">Symbols [A - Z]</string>
+    <string name="numbers_txt">Numbers [0 - 9]</string>
+    <string name="symbols_txt">Symbols ~!@#$%^&amp;*</string>
+    <string name="pass_length_txt">Password length</string>
 </resources>

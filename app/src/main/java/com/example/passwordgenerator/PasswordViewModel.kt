@@ -24,7 +24,9 @@ data class PasswordStateHolder (
 )
 
 class PasswordViewModel: ViewModel() {
-    val uiState by mutableStateOf(PasswordStateHolder())
+    var uiState by mutableStateOf(PasswordStateHolder())
+        private set
+
 
     fun generate() {
         uiState.password.value = PasswordGenerator.generate(
@@ -34,6 +36,10 @@ class PasswordViewModel: ViewModel() {
             uiState.useNumbers.value,
             uiState.useSymbols.value
         )
+    }
+
+    fun setLength(length: Int) {
+        uiState.passLength.value = length
     }
 
     fun setComplexity(complexity: PassComplexityEnum) {

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +45,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PasswordCard(viewModel: PasswordViewModel = viewModel()) {
 
+    val uiState = viewModel.uiState
+
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
@@ -52,7 +55,7 @@ fun PasswordCard(viewModel: PasswordViewModel = viewModel()) {
         scaffoldState = scaffoldState,
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text("Generate") },
+                text = { Text(stringResource(id = R.string.btn_generate_txt)) },
                 onClick = {
                     viewModel.generate()
                     // show snackbar as a suspend function
@@ -66,39 +69,34 @@ fun PasswordCard(viewModel: PasswordViewModel = viewModel()) {
         },
     ) { contentPadding ->
         Column(modifier = Modifier.padding(contentPadding)) {
-//        Divider()
 
-            Password(viewModel.uiState.password.value)
+            Password(uiState.password.value)
             Spacer(modifier = Modifier.size(16.dp))
 
-//        PasswordComplexity()
             PasswordComplexityWithChips(action = { viewModel.setComplexity(it) })
             Spacer(modifier = Modifier.size(16.dp))
 
-//        PasswordLength()
-            PassLengthSlider(
-                viewModel.uiState.passLength.value,
-                { viewModel.uiState.passLength.value = it })
+            PassLengthSlider(viewModel.uiState.passLength.value
+            ) { viewModel.setLength(it) }
             Spacer(modifier = Modifier.size(16.dp))
 
-            //PasswordParameters()
             CheckBoxAndText(
-                text = "a - z",
+                text = stringResource(id = R.string.lower_case_txt),
                 handler = { viewModel.uiState.useLowerLetters.value = it },
                 viewModel.uiState.useLowerLetters.value
             )
             CheckBoxAndText(
-                text = "A - Z",
+                text = stringResource(id = R.string.upper_case_txt),
                 handler = { viewModel.uiState.useUpperLetters.value = it },
                 viewModel.uiState.useUpperLetters.value
             )
             CheckBoxAndText(
-                text = "0 - 9",
+                text = stringResource(id = R.string.numbers_txt),
                 handler = { viewModel.uiState.useNumbers.value = it },
                 viewModel.uiState.useNumbers.value
             )
             CheckBoxAndText(
-                text = "!, @, #, ...",
+                text = stringResource(id = R.string.symbols_txt),
                 { viewModel.uiState.useSymbols.value = it },
                 viewModel.uiState.useSymbols.value
             )
@@ -115,44 +113,29 @@ fun PasswordComplexityWithChips(action: (PassComplexityEnum) -> Unit) {
             modifier = Modifier
                 .weight(1f, true),
             onClick = { action(PassComplexityEnum.HARD) }) {
-            Text("Hard")
+            Text(stringResource(id = R.string.hard_pass_text))
         }
         Chip(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
             onClick = { action(PassComplexityEnum.MEDIUM) }) {
-            Text("Medium")
+            Text(stringResource(id = R.string.medium_pass_text))
         }
         Chip(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
             onClick = { action(PassComplexityEnum.EASY) }) {
-            Text("Easy")
+            Text(stringResource(id = R.string.easy_pass_text))
         }
         Chip(
             modifier = Modifier
                 .weight(1f),
             onClick = { action(PassComplexityEnum.PIN) }) {
-            Text("PIN")
+            Text(stringResource(id = R.string.pincode_text))
         }
 
-    }
-}
-
-@Composable
-fun PasswordParameters() {
-    var lowLetters by rememberSaveable { mutableStateOf(true) }
-    var highLetters by remember { mutableStateOf(true) }
-    var numbers by remember { mutableStateOf(true) }
-    var symbols by remember { mutableStateOf(false) }
-
-    Column() {
-        CheckBoxAndText(text = "a - z", handler = { lowLetters = it }, lowLetters )
-        CheckBoxAndText(text = "A - Z", handler = { highLetters = it }, highLetters)
-        CheckBoxAndText(text = "0 - 9", handler = { numbers = it }, numbers)
-        CheckBoxAndText(text = "!, @, #, ...", handler = { symbols = it }, symbols, false)
     }
 }
 
@@ -194,7 +177,7 @@ fun PasswordLength() {
                 passLength = it.toIntOrNull() ?: 0
                 isError = passLength < 4 || passLength > 20
                             },
-            label = { Text("Password length") },
+            label = { Text(stringResource(id = R.string.pass_length_txt)) },
             singleLine = true,
             isError = isError,
             keyboardOptions = KeyboardOptions(
@@ -221,6 +204,9 @@ fun PasswordLength() {
 
 @Composable
 fun PassLengthSlider(passLength: Int, setLength: (Int) -> Unit) {
+    val range = 4f .. 12f
+    val steps = range.endInclusive - range.start - 1
+
     //var value by rememberSaveable { mutableStateOf(passLength.toFloat()) }
     var value = passLength.toFloat()
 //    var value by remember { mutableStateOf(8f) }
@@ -229,7 +215,7 @@ fun PassLengthSlider(passLength: Int, setLength: (Int) -> Unit) {
 
     Column() {
         Row() {
-            Text(text = "Password length ")
+            Text(text = stringResource(id = R.string.pass_length_txt))
             Text(text = valueText.toString())
         }
         Slider(
@@ -241,8 +227,8 @@ fun PassLengthSlider(passLength: Int, setLength: (Int) -> Unit) {
 
             },
             //onValueChangeFinished = { setLength (valueText) },
-            valueRange = 4f .. 15f,
-            steps = 10
+            valueRange = range,
+            steps = steps.toInt()
         )
     }
 

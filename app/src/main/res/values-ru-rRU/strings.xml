@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PasswordGenerator</string>
-    <string name="pincode_text">ПИН код</string>
+    <string name="app_name">Генератор паролей</string>
     <string name="easy_pass_text">Простой</string>
     <string name="medium_pass_text">Средний</string>
     <string name="hard_pass_text">Сложный</string>
     <string name="pass_complexity_text">Сложность</string>
+    <string name="btn_generate_txt">Создать</string>
+    <string name="lower_case_txt">Буквы [a – z]</string>
+    <string name="upper_case_txt">Буквы [A – Z]</string>
+    <string name="numbers_txt">Цифры [0 – 9]</string>
+    <string name="symbols_txt">Символы ~!@#$%^&amp;*</string>
+    <string name="pass_length_txt">Длина пароля</string>
 </resources>
