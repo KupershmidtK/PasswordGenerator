@@ -14,7 +14,7 @@ enum class PassComplexityEnum {
     CUSTOM
 }
 data class PasswordStateHolder (
-    var password: String = "PASSWORD",
+    var password: MutableState<String> = mutableStateOf("PASSWORD"),
     var passComplexity: MutableState<PassComplexityEnum> = mutableStateOf(PassComplexityEnum.MEDIUM),
     var passLength: MutableState<Int> = mutableStateOf(8),
     var useLowerLetters: MutableState<Boolean> = mutableStateOf(true),
@@ -26,6 +26,15 @@ data class PasswordStateHolder (
 class PasswordViewModel: ViewModel() {
     val uiState by mutableStateOf(PasswordStateHolder())
 
+    fun generate() {
+        uiState.password.value = PasswordGenerator.generate(
+            uiState.passLength.value,
+            uiState.useLowerLetters.value,
+            uiState.useUpperLetters.value,
+            uiState.useNumbers.value,
+            uiState.useSymbols.value
+        )
+    }
 
     fun setComplexity(complexity: PassComplexityEnum) {
         when(complexity) {

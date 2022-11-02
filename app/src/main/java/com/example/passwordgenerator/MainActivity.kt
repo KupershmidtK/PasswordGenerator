@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.passwordgenerator.ui.theme.PasswordGeneratorTheme
+import kotlin.math.roundToInt
 
 
 class MainActivity : ComponentActivity() {
@@ -43,35 +44,65 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PasswordCard(viewModel: PasswordViewModel = viewModel()) {
 
-    Column (modifier = Modifier.padding(8.dp)) {
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+
+    Scaffold(
+        modifier = Modifier.padding(8.dp),
+        scaffoldState = scaffoldState,
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text("Generate") },
+                onClick = {
+                    viewModel.generate()
+                    // show snackbar as a suspend function
+                    /*scope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            password
+                        )
+                    }*/
+                }
+            )
+        },
+    ) { contentPadding ->
+        Column(modifier = Modifier.padding(contentPadding)) {
 //        Divider()
 
-        Password()
-        Spacer(modifier = Modifier.size(16.dp))
+            Password(viewModel.uiState.password.value)
+            Spacer(modifier = Modifier.size(16.dp))
 
 //        PasswordComplexity()
-        PasswordComplexityWithChips(action = { viewModel.setComplexity(it) })
-        Spacer(modifier = Modifier.size(16.dp))
+            PasswordComplexityWithChips(action = { viewModel.setComplexity(it) })
+            Spacer(modifier = Modifier.size(16.dp))
 
 //        PasswordLength()
-        PassLengthSlider(viewModel.uiState.passLength.value, { viewModel.uiState.passLength.value = it })
-        Spacer(modifier = Modifier.size(16.dp))
+            PassLengthSlider(
+                viewModel.uiState.passLength.value,
+                { viewModel.uiState.passLength.value = it })
+            Spacer(modifier = Modifier.size(16.dp))
 
-        //PasswordParameters()
-        CheckBoxAndText(text = "a - z", handler = { viewModel.uiState.useLowerLetters.value = it }, viewModel.uiState.useLowerLetters.value )
-        CheckBoxAndText(text = "A - Z", handler = { viewModel.uiState.useUpperLetters.value = it }, viewModel.uiState.useUpperLetters.value )
-        CheckBoxAndText(text = "0 - 9", handler = { viewModel.uiState.useNumbers.value = it }, viewModel.uiState.useNumbers.value )
-        CheckBoxAndText(text = "!, @, #, ...", { viewModel.uiState.useSymbols.value = it }, viewModel.uiState.useSymbols.value )
-
-        Spacer(modifier = Modifier.size(16.dp))
-        
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Generate")
+            //PasswordParameters()
+            CheckBoxAndText(
+                text = "a - z",
+                handler = { viewModel.uiState.useLowerLetters.value = it },
+                viewModel.uiState.useLowerLetters.value
+            )
+            CheckBoxAndText(
+                text = "A - Z",
+                handler = { viewModel.uiState.useUpperLetters.value = it },
+                viewModel.uiState.useUpperLetters.value
+            )
+            CheckBoxAndText(
+                text = "0 - 9",
+                handler = { viewModel.uiState.useNumbers.value = it },
+                viewModel.uiState.useNumbers.value
+            )
+            CheckBoxAndText(
+                text = "!, @, #, ...",
+                { viewModel.uiState.useSymbols.value = it },
+                viewModel.uiState.useSymbols.value
+            )
         }
-        
     }
 
 }
@@ -140,9 +171,9 @@ fun CheckBoxAndText(text: String, handler: (Boolean) -> Unit, checked: Boolean =
 }
 
 @Composable
-fun Password() {
+fun Password(password: String) {
     Text(
-        text = "PASSWORD",
+        text = password,
         fontSize = 48.sp,
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
@@ -192,19 +223,21 @@ fun PasswordLength() {
 fun PassLengthSlider(passLength: Int, setLength: (Int) -> Unit) {
     //var value by rememberSaveable { mutableStateOf(passLength.toFloat()) }
     var value = passLength.toFloat()
-    var valueText by rememberSaveable { mutableStateOf(passLength) }
+//    var value by remember { mutableStateOf(8f) }
+//    var valueText by rememberSaveable { mutableStateOf(value.toInt()) }
+    var valueText = value.toInt()
 
     Column() {
         Row() {
             Text(text = "Password length ")
-            Text(text = passLength.toString())
+            Text(text = valueText.toString())
         }
         Slider(
-            value = passLength.toFloat(),
+            value = value,
             onValueChange = {
                 //value = it
-                //valueText = it.toInt()
-                setLength( it.toInt() )
+                valueText = it.roundToInt()
+                setLength( valueText )
 
             },
             //onValueChangeFinished = { setLength (valueText) },
