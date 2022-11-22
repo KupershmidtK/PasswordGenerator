@@ -1,10 +1,22 @@
 package com.example.passwordgenerator
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+
+sealed class PasswordUIState(
+    private val passLength: Int,
+    private val useLowerLetters: Boolean,
+    private val useUpperLetters: Boolean,
+    private val useNumbers: Boolean,
+    private val useSymbols: Boolean,
+) {
+    object HardPasswordUIState : PasswordUIState(12, true, true, true, true)
+    object MediumPasswordUIState : PasswordUIState(8, true, true, true, true)
+    object EasyPasswordUIState : PasswordUIState(6, true, false, true, false)
+    object PinPasswordUIState : PasswordUIState(4, false, false, true, false)
+//    data class CustomPasswordUIState(4, false, false, true, false) : PasswordUIState(4, false, false, true, false)
+
+}
 
 enum class PassComplexityEnum {
     HARD,
@@ -24,22 +36,23 @@ data class PasswordStateHolder (
 )
 
 class PasswordViewModel: ViewModel() {
-    var uiState by mutableStateOf(PasswordStateHolder())
-        private set
+    private val _uiState = mutableStateOf(PasswordStateHolder())
+    val uiState: State<PasswordStateHolder>
+        get() = _uiState
 
 
     fun generate() {
-        uiState.password.value = PasswordGenerator.generate(
-            uiState.passLength.value,
-            uiState.useLowerLetters.value,
-            uiState.useUpperLetters.value,
-            uiState.useNumbers.value,
-            uiState.useSymbols.value
+        _uiState.value.password.value = PasswordGenerator.generate(
+            _uiState.value.passLength.value,
+            _uiState.value.useLowerLetters.value,
+            _uiState.value.useUpperLetters.value,
+            _uiState.value.useNumbers.value,
+            _uiState.value.useSymbols.value
         )
     }
 
     fun setLength(length: Int) {
-        uiState.passLength.value = length
+        _uiState.value.passLength.value = length
     }
 
     fun setComplexity(complexity: PassComplexityEnum) {
@@ -67,7 +80,7 @@ class PasswordViewModel: ViewModel() {
         upperLetters: Boolean = true,
         numbers: Boolean = true,
         symbols: Boolean = true) {
-            uiState.apply {
+            _uiState.value.apply {
                 passLength.value = length
                 useLowerLetters.value = lowerLetters
                 useUpperLetters.value = upperLetters

@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PasswordCard(viewModel: PasswordViewModel = viewModel()) {
 
-    val uiState = viewModel.uiState
+    val uiState = viewModel.uiState.value
 
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -76,29 +76,29 @@ fun PasswordCard(viewModel: PasswordViewModel = viewModel()) {
             PasswordComplexityWithChips(action = { viewModel.setComplexity(it) })
             Spacer(modifier = Modifier.size(16.dp))
 
-            PassLengthSlider(viewModel.uiState.passLength.value
+            PassLengthSlider(uiState.passLength.value
             ) { viewModel.setLength(it) }
             Spacer(modifier = Modifier.size(16.dp))
 
             CheckBoxAndText(
                 text = stringResource(id = R.string.lower_case_txt),
-                handler = { viewModel.uiState.useLowerLetters.value = it },
-                viewModel.uiState.useLowerLetters.value
+                handler = { uiState.useLowerLetters.value = it },
+                uiState.useLowerLetters.value
             )
             CheckBoxAndText(
                 text = stringResource(id = R.string.upper_case_txt),
-                handler = { viewModel.uiState.useUpperLetters.value = it },
-                viewModel.uiState.useUpperLetters.value
+                handler = { uiState.useUpperLetters.value = it },
+                uiState.useUpperLetters.value
             )
             CheckBoxAndText(
                 text = stringResource(id = R.string.numbers_txt),
-                handler = { viewModel.uiState.useNumbers.value = it },
-                viewModel.uiState.useNumbers.value
+                handler = { uiState.useNumbers.value = it },
+                uiState.useNumbers.value
             )
             CheckBoxAndText(
                 text = stringResource(id = R.string.symbols_txt),
-                { viewModel.uiState.useSymbols.value = it },
-                viewModel.uiState.useSymbols.value
+                { uiState.useSymbols.value = it },
+                uiState.useSymbols.value
             )
         }
     }
