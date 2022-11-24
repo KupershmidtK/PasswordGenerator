@@ -18,10 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.passwordgenerator.PassComplexityEnum
-import com.example.passwordgenerator.PasswordViewModel
+import com.example.passwordgenerator.*
 import com.example.passwordgenerator.R
 import com.example.passwordgenerator.ui.theme.PasswordGeneratorTheme
+import kotlin.math.nextTowards
 import kotlin.math.roundToInt
 
 @Composable
@@ -65,29 +65,29 @@ fun PasswordCard(viewModel: PasswordViewModel) {
         PasswordComplexityWithChips(action = { viewModel.setComplexity(it) })
         Spacer(modifier = Modifier.size(16.dp))
 
-        PassLengthSlider(uiState.passLength
+        PassLengthSlider(uiState.value.passLength
         ) { viewModel.setLength(it) }
         Spacer(modifier = Modifier.size(16.dp))
 
         CheckBoxAndText(
             text = stringResource(id = R.string.lower_case_txt),
             handler = { viewModel.setLowerLetters(it) },
-            uiState.useLowerLetters
+            uiState.value.useLowerLetters
         )
         CheckBoxAndText(
             text = stringResource(id = R.string.upper_case_txt),
             handler = { viewModel.setUpperLetters(it) },
-            uiState.useUpperLetters
+            uiState.value.useUpperLetters
         )
         CheckBoxAndText(
             text = stringResource(id = R.string.numbers_txt),
             handler = { viewModel.setNumbers(it) },
-            uiState.useNumbers
+            uiState.value.useNumbers
         )
         CheckBoxAndText(
             text = stringResource(id = R.string.symbols_txt),
             { viewModel.setSymbols(it) },
-            uiState.useSymbols
+            uiState.value.useSymbols
         )
     }
 
@@ -95,32 +95,32 @@ fun PasswordCard(viewModel: PasswordViewModel) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PasswordComplexityWithChips(action: (PassComplexityEnum) -> Unit) {
+fun PasswordComplexityWithChips(action: (PassStateHolder) -> Unit) {
     Row {
         Chip(
             modifier = Modifier
                 .weight(1f, true),
-            onClick = { action(PassComplexityEnum.HARD) }) {
+            onClick = { action(PassStateHolder.Hard) }) {
             Text(stringResource(id = R.string.hard_pass_text))
         }
         Chip(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
-            onClick = { action(PassComplexityEnum.MEDIUM) }) {
+            onClick = { action(PassStateHolder.Medium) }) {
             Text(stringResource(id = R.string.medium_pass_text))
         }
         Chip(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
-            onClick = { action(PassComplexityEnum.EASY) }) {
+            onClick = { action(PassStateHolder.Easy) }) {
             Text(stringResource(id = R.string.easy_pass_text))
         }
         Chip(
             modifier = Modifier
                 .weight(1f),
-            onClick = { action(PassComplexityEnum.PIN) }) {
+            onClick = { action(PassStateHolder.PIN) }) {
             Text(stringResource(id = R.string.pincode_text))
         }
 
@@ -192,29 +192,29 @@ fun PasswordLength() {
 
 @Composable
 fun PassLengthSlider(passLength: Int, setLength: (Int) -> Unit) {
-    val range = 4f .. 12f
+    val range = PassStateHolder.PIN.value.passLength.toFloat() .. PassStateHolder.Hard.value.passLength.toFloat()
     val steps = range.endInclusive - range.start - 1
 
     //var value by rememberSaveable { mutableStateOf(passLength.toFloat()) }
-    var value = passLength.toFloat()
+    var value by remember { mutableStateOf( passLength.toFloat()) }
 //    var value by remember { mutableStateOf(8f) }
 //    var valueText by rememberSaveable { mutableStateOf(value.toInt()) }
-    var valueText = value.toInt()
+    //var valueText = value.toInt()
 
     Column() {
         Row() {
             Text(text = stringResource(id = R.string.pass_length_txt))
-            Text(text = valueText.toString())
+            Text(text = value.roundToInt().toString())
         }
         Slider(
             value = value,
             onValueChange = {
-                //value = it
-                valueText = it.roundToInt()
-                setLength( valueText )
+                value = it
+                //valueText = it.roundToInt()
+                //setLength( valueText )
 
             },
-            //onValueChangeFinished = { setLength (valueText) },
+            onValueChangeFinished = { setLength (value.roundToInt()) },
             valueRange = range,
             steps = steps.toInt()
         )
