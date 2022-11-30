@@ -21,6 +21,8 @@ object PasswordGenerator  {
         selection += if (numbers) this.numbers else "";
         selection += if (symbols) this.symbols else "";
 
+        if (selection.isBlank()) throw Exception()
+
         repeat(length) {
             result.add(selection.random())
         }

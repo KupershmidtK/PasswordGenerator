@@ -2,9 +2,13 @@ package com.example.passwordgenerator
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+import com.example.passwordgenerator.data.PassStateHolder
+import com.example.passwordgenerator.data.PasswordStateHolder
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-
+/*
 enum class PassComplexityEnum {
     HARD,
     MEDIUM,
@@ -12,7 +16,7 @@ enum class PassComplexityEnum {
     PIN,
     CUSTOM
 }
-
+*/
 //data class PasswordStateHolder (
 //    var password: MutableState<String> = mutableStateOf("PASSWORD"),
 //    var passComplexity: MutableState<PassComplexityEnum> = mutableStateOf(PassComplexityEnum.MEDIUM),
@@ -22,6 +26,7 @@ enum class PassComplexityEnum {
 //    var useNumbers: MutableState<Boolean> = mutableStateOf(true),
 //    var useSymbols: MutableState<Boolean> = mutableStateOf(true),
 //)
+/*
 data class PasswordStateHolder (
 //    var password: String = "PASSWORD",
 //    val passComplexity: PassComplexityEnum = PassComplexityEnum.MEDIUM,
@@ -31,6 +36,8 @@ data class PasswordStateHolder (
     val useNumbers: Boolean = true,
     val useSymbols: Boolean = true,
 )
+*/
+
 /*
 sealed interface PassStateHolder {
     val value: PasswordStateHolder
@@ -42,13 +49,7 @@ sealed interface PassStateHolder {
     data class Custom(override val value: PasswordStateHolder = PasswordStateHolder()) : PassStateHolder
 }
 */
-sealed class PassStateHolder(val value: PasswordStateHolder) {
-    object Hard : PassStateHolder(PasswordStateHolder(12))
-    object Medium : PassStateHolder(PasswordStateHolder())
-    object Easy : PassStateHolder(PasswordStateHolder(7, useUpperLetters  = false, useSymbols = false))
-    object PIN  : PassStateHolder(PasswordStateHolder(4, false, false, false, false))
-    data class Custom(val v: PasswordStateHolder = PasswordStateHolder()) : PassStateHolder(v)
-}
+
 
 class PasswordViewModel: ViewModel() {
 //    private val _uiState = mutableStateOf(PasswordStateHolder())
@@ -58,45 +59,64 @@ class PasswordViewModel: ViewModel() {
 //    var uiState = MutableStateFlow(PasswordStateHolder())
 //        private set
 
-    //    var uiState by mutableStateOf(PasswordStateHolder())
-    var uiState: PassStateHolder by mutableStateOf(PassStateHolder.Medium)
-        private set
+
+    private val _uiState: MutableStateFlow<PassStateHolder> = MutableStateFlow(PassStateHolder.Medium)
+    val uiState: StateFlow<PassStateHolder> = _uiState.asStateFlow()
+
+//    init {
+//        uiState = _uiState.asStateFlow()
+//    }
+
+
+//    var uiState: PassStateHolder by mutableStateOf(PassStateHolder.Medium)
+//        private set
 
     var password by mutableStateOf("PASSWORD")
         private set
 
     fun generate() {
         password = PasswordGenerator.generate(
-            uiState.value.passLength,
-            uiState.value.useLowerLetters,
-            uiState.value.useUpperLetters,
-            uiState.value.useNumbers,
-            uiState.value.useSymbols
+            uiState.value.value.passLength,
+            uiState.value.value.useLowerLetters,
+            uiState.value.value.useUpperLetters,
+            uiState.value.value.useNumbers,
+            uiState.value.value.useSymbols
         )
     }
 
     fun setLength(length: Int) {
-//        uiState = uiState.copy(passComplexity = PassComplexityEnum.CUSTOM, passLength = length)
-        uiState = PassStateHolder.Custom(uiState.value.copy(passLength = length))
+        //uiState = PassStateHolder.Custom(uiState.value.copy(passLength = length))
+        _uiState.update {
+            PassStateHolder.Custom(it.value.copy(passLength = length))
+        }
     }
 
     fun setLowerLetters(flag: Boolean) {
-        uiState = PassStateHolder.Custom(uiState.value.copy(useLowerLetters = flag))
+//        uiState = PassStateHolder.Custom(uiState.value.copy(useLowerLetters = flag))
+        _uiState.update {
+            PassStateHolder.Custom(it.value.copy(useLowerLetters = flag))
+        }
     }
 
     fun setUpperLetters(flag: Boolean) {
-//        uiState = uiState.copy(passComplexity = PassComplexityEnum.CUSTOM, useUpperLetters = flag)
-        uiState = PassStateHolder.Custom(uiState.value.copy(useUpperLetters = flag))
+//        uiState = PassStateHolder.Custom(uiState.value.copy(useUpperLetters = flag))
+        _uiState.update {
+            PassStateHolder.Custom(it.value.copy(useUpperLetters = flag))
+        }
     }
 
     fun setNumbers(flag: Boolean) {
-//        uiState = uiState.copy(passComplexity = PassComplexityEnum.CUSTOM, useNumbers = flag)
-        uiState = PassStateHolder.Custom(uiState.value.copy(useNumbers = flag))
+//        uiState = PassStateHolder.Custom(uiState.value.copy(useNumbers = flag))
+        _uiState.update {
+            PassStateHolder.Custom(it.value.copy(useNumbers = flag))
+        }
     }
 
     fun setSymbols(flag: Boolean) {
-//        uiState = uiState.copy(passComplexity = PassComplexityEnum.CUSTOM, useSymbols = flag)
-        uiState = PassStateHolder.Custom(uiState.value.copy(useSymbols = flag))
+//        uiState = PassStateHolder.Custom(uiState.value.copy(useSymbols = flag))
+        _uiState.update {
+            PassStateHolder.Custom(it.value.copy(useSymbols = flag))
+        }
     }
 
 //    fun setComplexity(complexity: PassComplexityEnum) {
@@ -110,7 +130,7 @@ class PasswordViewModel: ViewModel() {
 //    }
 
     fun setComplexity(complexity: PassStateHolder) {
-        uiState = complexity
+        _uiState.update { complexity }
     }
 /*
     private fun setState(
@@ -132,3 +152,5 @@ class PasswordViewModel: ViewModel() {
 }
 */
 }
+
+

@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.passwordgenerator.ui.PassGenScreen
+import com.example.passwordgenerator.ui.PassApp
 import com.example.passwordgenerator.ui.theme.PasswordGeneratorTheme
 import kotlin.math.roundToInt
 
@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PasswordGeneratorTheme {
-                PassGenScreen()
+                PassApp()
             }
         }
     }

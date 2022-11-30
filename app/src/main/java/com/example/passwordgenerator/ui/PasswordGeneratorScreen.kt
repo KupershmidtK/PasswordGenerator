@@ -20,39 +20,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passwordgenerator.*
 import com.example.passwordgenerator.R
+import com.example.passwordgenerator.data.PassStateHolder
 import com.example.passwordgenerator.ui.theme.PasswordGeneratorTheme
 import kotlin.math.nextTowards
 import kotlin.math.roundToInt
 
-@Composable
-fun PassGenScreen() {
 
-    val viewModel: PasswordViewModel = viewModel()
-
-    // A surface container using the 'background' color from the theme
-    Scaffold(
-        modifier = Modifier,
-        topBar = { Text(text = stringResource(id = R.string.app_name)) },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text(stringResource(id = R.string.btn_generate_txt)) },
-                onClick = { viewModel.generate() }
-            )
-        }
-    ) { padding ->
-        Surface(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            color = MaterialTheme.colors.background
-        ) {
-            PasswordCard(viewModel)
-        }
-    }
-}
 
 @Composable
 fun PasswordCard(viewModel: PasswordViewModel) {
 
-    val uiState = viewModel.uiState
+    val uiState = viewModel.uiState.collectAsState().value
 
 //    val scaffoldState = rememberScaffoldState()
 //    val scope = rememberCoroutineScope()
@@ -196,7 +174,8 @@ fun PassLengthSlider(passLength: Int, setLength: (Int) -> Unit) {
     val steps = range.endInclusive - range.start - 1
 
     //var value by rememberSaveable { mutableStateOf(passLength.toFloat()) }
-    var value by remember { mutableStateOf( passLength.toFloat()) }
+//    var value by remember { mutableStateOf( passLength.toFloat()) }
+    var value = remember { passLength.toFloat() }
 //    var value by remember { mutableStateOf(8f) }
 //    var valueText by rememberSaveable { mutableStateOf(value.toInt()) }
     //var valueText = value.toInt()
@@ -204,17 +183,18 @@ fun PassLengthSlider(passLength: Int, setLength: (Int) -> Unit) {
     Column() {
         Row() {
             Text(text = stringResource(id = R.string.pass_length_txt))
-            Text(text = value.roundToInt().toString())
+            Text(text = passLength.toString())
         }
         Slider(
-            value = value,
+            value = passLength.toFloat(),
             onValueChange = {
-                value = it
+//                value = it
+                setLength (it.roundToInt())
                 //valueText = it.roundToInt()
                 //setLength( valueText )
 
             },
-            onValueChangeFinished = { setLength (value.roundToInt()) },
+            //onValueChangeFinished = { setLength (value.roundToInt()) },
             valueRange = range,
             steps = steps.toInt()
         )
